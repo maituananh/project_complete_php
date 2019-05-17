@@ -1,0 +1,18 @@
+#big {
+  border-style: solid;
+  border-color: rgb(255, 199, 199);
+  height: 500px;
+  width: 100%;
+
+}
+
+div .author img {
+  height: 300px;
+  width: 500px;
+  float: left;
+}
+
+div #information {
+  border-style: solid;
+  float: left;
+}
