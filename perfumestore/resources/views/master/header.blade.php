@@ -46,6 +46,7 @@
                   <li class="active"><a href="/htdocphp/perfumestore/public/home"><span>Home</span></a></li>
 
                   @if (Session::has("roles") != "")
+                  <li><a href="/htdocphp/perfumestore/public/purchased"><span>Purchased</span></a></li>
                   <li><a href="/htdocphp/perfumestore/public/cart"><span>Cart</span></a></li>
                   <li><a href="/htdocphp/perfumestore/public/logout"><span>Log Out</span></a></li>
                   @if (Session::has("roles") == 1)

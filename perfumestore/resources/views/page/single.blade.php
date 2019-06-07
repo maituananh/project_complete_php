@@ -8,7 +8,7 @@
 
 				@foreach ($single as $item)
 				<div class="row model-detail d-mf-flex align-items-center">
-					<div class="col-md-6 ftco-animate">
+					<div class="col-md-5 ftco-animate" style="float: left">
 						<div class="carousel-model owl-carousel">
 							<div class="items">
 								<img src="{{ asset('images') }}/{{$item->image}}" class="img-fluid"
@@ -17,21 +17,29 @@
 						</div>
 					</div>
 					<div class="col-md-1"></div>
-					<div class="col-md-5 model-info ftco-animate">
-						<h3 class="mb-4">{{$item->name}}</h3>
-						<p><span>Name</span> <span>{{$item->name}}</span></p>
-						<p><span>Carrier</span> <span>{{$item->Name}}</span></p>
-						<p><span>Price</span> <span>{{$item->price}}.000 VND</span></p>
-						<p><span>Quantity</span> <span>{{$item->quantity}}</span></p>
-						<p><span>Detail</span> <span>{{$item->detail}}</span></p>
-						@if (Session::has("roles") == "")
-						<p class="mt-4"><a href="/htdocphp/perfumestore/public/login"
-								class="btn btn-primary py-3 px-4">Need Login</a></p>
-						@else
-						<p class="mt-4"><a href="/htdocphp/perfumestore/public/buy/{{$item->id_products}}"
-								class="btn btn-primary py-3 px-4">Buy Now</a></p>
-						@endif
-					</div>
+
+					<form action="/htdocphp/perfumestore/public/addCart" method="post" style="width: auto">
+						{{ csrf_field() }}
+						<div style="display: none">
+							<input name="id_products" type="number" value="{{$item->id_products}}">
+						</div>
+						<div class="col-md-12 model-info ftco-animate">
+							<h3 class="mb-4">{{$item->name}}</h3>
+							<p><span>Name</span> <span>{{$item->name}}</span></p>
+							<p><span>Carrier</span> <span>{{$item->Name}}</span></p>
+							<p><span>Price</span> <span>{{$item->price}}.000 VND</span></p>
+							<p><span>Quantity in store</span> <span>{{$item->quantity}}</span></p>
+							<p><span>Detail</span> <span>{{$item->detail}}</span></p>
+							<p><span>Quantity</span> <span><input style="width: 50px;" min="1" max="5" name="quantity"
+										type="number"></span></p>
+							@if (Session::has("roles") == "")
+							<p class="mt-4"><a href="/htdocphp/perfumestore/public/login"
+									class="btn btn-primary py-3 px-4">Need Login</a></p>
+							@else
+							<p class="mt-4" class="btn btn-primary py-3 px-4"><input type="submit" value="ADD CART"></p>
+							@endif
+						</div>
+					</form>
 				</div>
 				@endforeach
 

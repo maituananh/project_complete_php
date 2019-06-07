@@ -24,8 +24,8 @@
                                 </div>
 
                                 <div class="box">
-                                    <p>Buy now</p>
-                                    <span><a href="buy/{{$item->id_products}}"> <i class="fas fa-shopping-bag"></i>
+                                    <p>Add Cart</p>
+                                    <span><a href="addOne/{{$item->id_products}}"> <i class="fas fa-shopping-cart"></i>
                                         </a></span>
                                 </div>
                             </div>
@@ -65,10 +65,10 @@
                                 <div class="box">
                                     @if (Session::has("roles") == "")
                                     <p>Need Login</p>
-                                    <span><a href="/login"> <i class="fas fa-sign-in-alt"></i> </a></span>
+                                    <span><a href="login"> <i class="fas fa-sign-in-alt"></i> </a></span>
                                     @else
-                                    <p>Buy now</p>
-                                    <span><a href="buy/{{$item->id_products}}"> <i class="fas fa-shopping-bag"></i>
+                                    <p>Add Cart</p>
+                                    <span><a href="addOne/{{$item->id_products}}"> <i class="fas fa-shopping-cart"></i>
                                         </a></span>
                                     @endif
                                 </div>

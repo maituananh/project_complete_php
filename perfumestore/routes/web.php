@@ -30,14 +30,22 @@ Route::get('/viewadd', function(){
 
 Route::post('/add', ['uses' => 'ManagementProducts@create']);
 
-Route::get('/buy/{id_products}', ['uses' => 'BuyProductsController@BuyProduct']);
 
-Route::post('/pay', ['uses' => 'BuyProductsController@pay']);
 
-Route::get('/cart', ['uses' => 'BuyProductsController@cart']);
+Route::get('/addOne/{id_products}', ['uses' => 'BuyProductsController@addone']); // thêm 1 sản phẩm vào giỏ hàng
 
-Route::get('/registration', function(){
+Route::get('/pay/{tongtien}', ['uses' => 'BuyProductsController@pay']); // tính tiền trong giỏ hàng hiện tại
+
+Route::get('/purchased', ['uses' => 'BuyProductsController@purchased']); // sản phẩm đã mua
+
+Route::get('/registration', function(){ // vào trang đăng kí
     return view('page.registration');
 });
 
-Route::post('/submitregistration', ['uses' => 'UsersController@create']);
+Route::post('/submitregistration', ['uses' => 'UsersController@create']); // thực hiện đăng ký
+
+Route::post('/addCart', ['uses' => 'CartController@addCart']); // thêm sản phẩm vào giỏ hàng + số lượng
+
+Route::get('/cart', ['uses' => 'CartController@show']); // sản phẩm đang có trong giỏ CHƯA TÍNH TIỀN
+
+Route::get('/deleteProductInCart/{id_products}', ['uses' => 'CartController@deleteProductInCart']); // xóa sản phẩm bất kì trong giỏ hàng

@@ -7,15 +7,50 @@ use Carbon\Carbon;
 
 class BuyProductsController extends Controller
 {
-    public function BuyProduct($id_products) {
-        try {
-            $buy = DB::table('products')
+    public function addone(Request $request, $id_products) {
+        try{
+            $dt = Carbon::now('Asia/Ho_Chi_Minh');
+            $price = 0;
+
+            // tạo giỏ hàng khi chưa có
+            $creatCart = DB::table('cart')
+            ->where('id_cart', '=', $request->session()->get('id_users'))
+            ->count();
+            if($creatCart != 1) {
+                $addCart =  DB::table('cart')->insert(
+                    [
+                        'id_cart' => $request->session()->get('id_users'), 
+                        'id_userCart' => $request->session()->get('id_users'),
+                        'ngayTao' => $dt->toDateString(),
+                        'gioTao' => $dt->toTimeString() , 
+                        'ngaySua' => $dt->toDateString(),
+                        'gioSua' => $dt->toTimeString()     
+                    ]
+                );
+            }
+
+            $checkProducts = DB::table('products')
             ->where('id_products', '=', $id_products)
-            ->join('productcarrier', 'id_productCarrier', '=', 'product_carrier')
-            ->select('products.name', 'products.id_products', 'products.price', 'products.image', 'productcarrier.Name', 'products.quantity', 'products.detail', 'products.id_products')
             ->get();
-            return view("page.pay", ['buy' => $buy]);
-        }catch(\Exception $e) {
+            foreach($checkProducts as $item) {
+                $price = $item->price;
+            }
+
+            $addCartDetail = DB::table('cartdetail')->insert(
+                    [
+                        'id_cartCartDetail' => $request->session()->get('id_users'),
+                        'id_productDetail' => $id_products,
+                        'price' => $price,
+                        'quantity' => 1,
+                        'status' => "unpaid", // mặc định là thanh toán
+                        'ngayTao' => $dt->toDateString(),
+                        'gioTao' => $dt->toTimeString() , 
+                        'ngaySua' => $dt->toDateString(),
+                        'gioSua' => $dt->toTimeString()     
+                    ]
+                );
+                return redirect('/cart');
+        }catch(\Exception $e){
             echo $e;
         }
     }
@@ -24,24 +59,26 @@ class BuyProductsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function pay(Request $request)
+    public function pay(Request $request, $tongtien)
     {
         $dt = Carbon::now('Asia/Ho_Chi_Minh');
         try {
             // tạo id order random
             $queryOrder = 0; 
             $id_order = rand();
-            while($queryOrder == 1) {
+            
+            do{
                 $id_order = rand();
                 $queryOrder = DB::table('orders')
                 ->where('id_orders', '=', $id_order)
                 ->count();
-            }
+            }while($queryOrder == 1);
+
             $payOrder = DB::table('orders')->insert(
                 [
                     'id_orders' => $id_order,
-                    'id_usersOrder' => $request->session()->get('id_users'),
-                    'totalMoney' => ($request->price * $request->quantity),
+                    'id_cartOrder' => $request->session()->get('id_users'),
+                    'totalMoney' => $tongtien,
                     'ngayTao' => $dt->toDateString(),
                     'gioTao' => $dt->toTimeString() , 
                     'ngaySua' => $dt->toDateString(),
@@ -49,15 +86,10 @@ class BuyProductsController extends Controller
                 ]
             );
 
-            $payOrderDetail =  DB::table('ordersdetail')->insert(
+            // đổi trạng thái thành đã thanh toán
+            $statuscCartdetail = DB::table('cartdetail')->update(
                 [
-                    'id_ordersOrdersdetail' => $id_order,
-                    'id_ProductsOrdersdetail' => $request->id,
-                    'price' => $request->price,
-                    'quantity'=>  $request->quantity,
-                    'status'=> 'Đã mua',
-                    'ngayTao' => $dt->toDateString(),
-                    'gioTao' => $dt->toTimeString() , 
+                    'status' => "paid",
                     'ngaySua' => $dt->toDateString(),
                     'gioSua' => $dt->toTimeString()     
                 ]
@@ -73,20 +105,21 @@ class BuyProductsController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function cart(Request $request)
+    public function purchased(Request $request)
     {
         try {
             $cart = DB::table('users')
-            ->where('id_users', '=', $request->session()->get('id_users'))
-            ->join('orders', 'id_usersOrder', '=', 'id_users')
-            ->join('ordersdetail', 'id_ordersOrdersdetail', '=', 'id_orders')
-            ->join('products', 'id_Products', '=', 'id_ProductsOrdersdetail')
+            ->where('id_users', '=', $request->session()->get('id_users'), 'and', 'ordersdetail.status', '=', 'paid')
+            ->join('cart', 'id_userCart', '=', 'id_users')
+            ->join('cartdetail', 'id_cartCartDetail', '=', 'id_cart')
+            ->join('products', 'id_Products', '=', 'id_productDetail')
             ->join('productcarrier', 'id_productCarrier', '=', 'product_carrier')
+            ->join('orders', 'id_cartOrder', '=', 'id_cart')
             ->select('products.name', 'products.id_products', 'products.price', 
-            'products.image', 'productcarrier.Name', 'ordersdetail.quantity', 
+            'products.image', 'productcarrier.Name', 'cartdetail.quantity', 
             'orders.totalMoney')
             ->get();
-            return view("page.cart", ['cart' => $cart]);
+            return view("page.purchased", ['cart' => $cart]);
         }catch(\Exception $e) {
             echo $e;
         }
